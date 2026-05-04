@@ -52,7 +52,7 @@ async function cargarEmpresas() {
 /* ── NAVEGACIÓN ── */
 
 function volverAlLogin() {
-  window.location.href = 'login.html';
+  window.location.href = 'index.html';
 }
 
 /* ── PASSWORD ── */
@@ -203,5 +203,5 @@ function mostrarExito(nombre) {
 function irALoginDesdeExito() {
   const user = (document.getElementById('reg-user')?.value || '').trim().toLowerCase();
   if (user) sessionStorage.setItem('prefill_user', user);
-  window.location.href = 'login.html';
+  window.location.href = 'index.html';
 }

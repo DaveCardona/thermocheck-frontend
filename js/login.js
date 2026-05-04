@@ -119,7 +119,7 @@ function logout() {
   sessionStorage.clear();
 
   //  Evita volver con botón atrás
-  window.location.replace('login.html');
+  window.location.replace('index.html');
 }
 
 

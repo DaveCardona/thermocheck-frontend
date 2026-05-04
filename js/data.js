@@ -29,7 +29,7 @@ function getEstadoInfo(estado) {
 
 /* ── NAVEGACIÓN ── */
 const SCREEN_PAGES = {
-  'screen-login': 'login.html',
+  'screen-login': 'index.html',
   'screen-registro': 'registro.html',
   'screen-paciente': 'paciente.html',
   'screen-admin': 'admin.html',

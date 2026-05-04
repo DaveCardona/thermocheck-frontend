@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sesion = sessionStorage.getItem('currentUser');
 
   if (!sesion) {
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
     return;
   }
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 🔥 Evitar volver atrás después de logout
   window.addEventListener('pageshow', function () {
     if (!sessionStorage.getItem('currentUser')) {
-      window.location.replace('login.html');
+      window.location.replace('index.html');
     }
   });
 

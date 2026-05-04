@@ -4,20 +4,20 @@ let medidas = [];
 const sesion = sessionStorage.getItem('currentUser');
 
 if (!sesion) {
-  window.location.replace('login.html');
+  window.location.replace('index.html');
 } else {
   document.body.style.display = 'block'; //  mostrar solo si está autorizado
 }
 
 //  PROTECCIÓN INMEDIATA (ANTES DE QUE RENDERICE NADA)
 if (!sessionStorage.getItem('currentUser')) {
-  window.location.replace('login.html');
+  window.location.replace('index.html');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   const sesion = sessionStorage.getItem('currentUser');
   if (!sesion) {
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
     return;
   }
 
@@ -308,14 +308,14 @@ function logout() {
   sessionStorage.removeItem("medicion_token");
 
   // redirigir
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 window.addEventListener('pageshow', function (event) {
   if (event.persisted || window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
     
     if (!sessionStorage.getItem('currentUser')) {
-      window.location.replace('login.html');
+      window.location.replace('index.html');
     }
   }
 });
