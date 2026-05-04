@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarTiposDocumento() {
   try {
-    const res = await fetch("http://localhost:3000/tipos-documento");
+    const res = await fetch("https://themocheck-backend-production.up.railway.app/tipos-documento");
     const data = await res.json();
 
     const select = document.getElementById('reg-tipo-doc');
@@ -34,7 +34,7 @@ async function cargarTiposDocumento() {
 
 async function cargarEmpresas() {
   try {
-    const res = await fetch("http://localhost:3000/empresas");
+    const res = await fetch("https://themocheck-backend-production.up.railway.app/empresas");
     const data = await res.json();
 
     const select = document.getElementById('reg-empresa');
@@ -148,7 +148,7 @@ async function doRegistro(e) {
   /* ── PETICIÓN AL BACKEND ── */
 
   try {
-    const res = await fetch("http://localhost:3000/register", {
+    const res = await fetch("https://themocheck-backend-production.up.railway.app/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

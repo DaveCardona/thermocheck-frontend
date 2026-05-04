@@ -1,3 +1,3 @@
 const CONFIG = {
-  API_URL: "http://localhost:3000"
+  API_URL: "https://themocheck-backend-production.up.railway.app"
 };
