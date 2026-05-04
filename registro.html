@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermoCheck — Crear cuenta</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/registro.css">
+</head>
+
+<body>
+
+  <div id="screen-registro" class="screen active">
+    <div class="registro-card">
+
+      <!-- Header con botón volver -->
+      <div class="registro-header">
+        <button class="back-btn" onclick="volverAlLogin()">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          Volver al login
+        </button>
+        <h2>Crear cuenta</h2>
+        <p>Completa tus datos para registrarte como paciente</p>
+      </div>
+
+      <!-- Formulario -->
+      <form id="registro-form" onsubmit="doRegistro(event)">
+
+        <div class="section-title">Datos personales</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="reg-nombre">Nombre *</label>
+            <input type="text" id="reg-nombre" placeholder="Ej: Ana">
+          </div>
+          <div class="field">
+            <label for="reg-apellido">Apellido *</label>
+            <input type="text" id="reg-apellido" placeholder="Ej: García">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Tipo de documento *</label>
+            <div class="select-wrap">
+              <select id="reg-tipo-doc">
+                <option value="">Selecciona</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Número de documento *</label>
+            <input type="text" id="reg-num-doc" placeholder="Ej: 1023456789">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="reg-celular">celular *</label>
+            <input type="tel" id="reg-celular" placeholder="Ej: 3001234567">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reg-direccion">Dirección *</label>
+          <input type="text" id="reg-direccion" placeholder="Ej: Calle 123 #45-67">
+        </div>
+
+        <div class="field">
+          <label>Empresa *</label>
+          <div class="select-wrap">
+            <select id="reg-empresa">
+              <option value="">Selecciona tu empresa</option>
+            </select>
+          </div>
+          <small style="color:var(--text3);font-size:.75rem;">
+            Si tu empresa no aparece, contacta a tu supervisor.
+          </small>
+        </div>
+
+        <hr class="field-divider">
+        <div class="section-title">Datos de acceso</div>
+
+        <div class="field">
+          <label for="reg-user">Nombre de usuario *</label>
+          <input type="text" id="reg-user" placeholder="Ej: ana.garcia" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label for="reg-pass">Contraseña *</label>
+          <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" oninput="onPassChange()"
+            autocomplete="new-password">
+          <div class="password-strength">
+            <div class="strength-bar" id="bar1"></div>
+            <div class="strength-bar" id="bar2"></div>
+            <div class="strength-bar" id="bar3"></div>
+            <span class="strength-label" id="strength-label"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reg-pass2">Confirmar contraseña *</label>
+          <input type="password" id="reg-pass2" placeholder="Repite la contraseña" autocomplete="new-password">
+        </div>
+
+
+        <label class="terms-check">
+          <input type="checkbox" id="reg-terminos">
+
+          <span class="terms-text">
+            Acepto el tratamiento de datos personales según la
+            <a href="docs/tratamiento_datos.pdf" target="_blank">
+              política de privacidad
+            </a>.
+          </span>
+        </label>
+
+
+        <div class="auth-error" id="reg-error"></div>
+
+        <button class="btn-primary" type="submit" style="margin-top:1.25rem">
+          Crear cuenta
+        </button>
+
+        <p class="auth-link">
+          ¿Ya tienes cuenta?
+          <a onclick="volverAlLogin()">Inicia sesión aquí</a>
+        </p>
+
+      </form>
+
+      <!-- Pantalla de éxito -->
+      <div id="registro-exito" style="display:none">
+        <div class="registro-success">
+          <div class="success-icon">✓</div>
+          <h3>¡Cuenta creada exitosamente!</h3>
+          <p>
+            Bienvenido, <strong id="exito-nombre"></strong>.<br>
+            Ya puedes iniciar sesión con tu usuario y contraseña.
+          </p>
+          <button class="btn-primary" onclick="irALoginDesdeExito()">
+            Ir a iniciar sesión
+          </button>
+        </div>
+      </div>
+
+    </div> <!-- registro-card -->
+
+  </div>
+
+
+  <!-- Toast global -->
+  <div class="toast" id="toast">
+    <div class="toast-dot" id="toast-dot"></div>
+    <span id="toast-msg"></span>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/registro.js"></script>
+
+
+</body>
+
+</html>

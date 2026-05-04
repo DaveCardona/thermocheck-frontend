@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermoCheck — Iniciar sesión</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/login.css">
+
+  
+</head>
+
+<body>
+
+  <div id="screen-login" class="screen">
+    <div class="auth-card">
+
+      <div class="auth-logo">
+        <div class="icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M9 22h6" />
+          </svg>
+        </div>
+        <div>
+          <h1>ThermoCheck</h1>
+          <span class="auth-subtitle">Control de temperatura corporal</span>
+        </div>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-paciente" onclick="switchLoginTab('paciente')">Paciente</button>
+        <button class="auth-tab" id="tab-admin" onclick="switchLoginTab('admin')">Administrador</button>
+      </div>
+
+      <form onsubmit="event.preventDefault(); doLogin();">
+
+        <div class="field">
+          <label for="login-user">Usuario</label>
+          <input type="text" id="login-user" placeholder="Ingresa tu usuario" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label for="login-pass">Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+      </form>
+
+      <button class="btn-primary" onclick="doLogin()">Iniciar sesión</button>
+      <div class="auth-error" id="login-error"></div>
+
+      <p class="auth-link">
+        ¿No tienes cuenta?
+        <a href="registro.html">Crear cuenta nueva</a>
+      </p>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <div class="toast-dot" id="toast-dot"></div>
+    <span id="toast-msg"></span>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/login.js"></script>
+
+
+</body>
+
+</html>

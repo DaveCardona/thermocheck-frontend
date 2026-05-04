@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermoCheck — Dashboard Admin</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="./css/admin.css">
+</head>
+
+<body>
+
+  <div id="screen-admin" class="screen active">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        </svg>
+        ThermoCheck
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--yellow);border-color:#78350f">Admin</span>
+      <div class="topbar-user">
+        <div class="avatar" id="admin-avatar"></div>
+        <span id="admin-nombre"></span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+
+    <!-- Contenido -->
+    <div class="main-content">
+
+      <!-- Tarjetas de estadísticas -->
+      <div class="admin-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total lecturas hoy</div>
+          <div class="stat-valor" id="stat-total" style="color:var(--accent)">0</div>
+          <div class="stat-sub">en las últimas 24h</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Promedio temperatura</div>
+          <div class="stat-valor" id="stat-prom">--.-</div>
+          <div class="stat-sub">últimas 24h</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Temperatura máxima</div>
+          <div class="stat-valor" id="stat-max" style="color:var(--yellow)">--.-</div>
+          <div class="stat-sub" id="stat-max-quien">—</div>
+        </div>
+        <div class="stat-card alert-card">
+          <div class="stat-label">⚠ Alertas de fiebre</div>
+          <div class="stat-valor" id="stat-alertas">0</div>
+          <div class="stat-sub">temperatura ≥ 38°C</div>
+        </div>
+      </div>
+
+      <!-- Banner de alertas activas -->
+      <div class="alertas-banner" id="alertas-banner">
+        <div class="alerta-dot"></div>
+        <p id="alertas-texto"></p>
+      </div>
+
+      <!-- Tabla de lecturas -->
+      <div class="tabla-wrap">
+        <div class="tabla-header">
+          <h3>Lecturas registradas</h3>
+          <div class="tabla-controls">
+            <div class="filtros">
+              <button class="filtro-btn active" onclick="setAdminFiltro('todos',this)">Todos</button>
+              <button class="filtro-btn" onclick="setAdminFiltro('normal',this)">Normal</button>
+              <button class="filtro-btn" onclick="setAdminFiltro('fiebre',this)">Fiebre</button>
+            </div>
+            <input type="search" class="tabla-search" id="tabla-search" placeholder="Buscar paciente..."
+              oninput="renderAdminTabla()">
+            <input type="search" id="filtro-empresa" class="tabla-search" placeholder="Buscar empresa..."
+              oninput="renderAdminTabla()">
+
+            <input type="date" id="filtro-fecha" class="tabla-search" onchange="renderAdminTabla()">
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Temperatura</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Empresa</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tabla-body">
+            <tr>
+              <td colspan="5" class="empty-state">Sin registros</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="paginacion">
+          <span id="pag-info">Mostrando 0 registros</span>
+          <div class="pag-btns" id="pag-btns"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <div class="toast-dot" id="toast-dot"></div>
+    <span id="toast-msg"></span>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/admin.js"></script>
+
+  <div id="modal-detalle" class="modal">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3>Detalle del paciente</h3>
+        <button onclick="cerrarModal()">✕</button>
+      </div>
+
+      <div class="modal-body" id="modal-body">
+        <!-- contenido dinámico -->
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>

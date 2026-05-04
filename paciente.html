@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermoCheck — Mi temperatura</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/paciente.css">
+
+  <style>
+    body {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="screen-paciente" class="screen active">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        </svg>
+        ThermoCheck
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge">Paciente</span>
+      <div class="topbar-user">
+        <div class="avatar" id="pac-avatar">--</div>
+        <span id="pac-nombre">—</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+
+    <!-- Contenido -->
+    <div class="main-content">
+
+      <div class="pac-page-header">
+        <h2>Mi estado hoy</h2>
+        <p id="pac-fecha-hoy">—</p>
+      </div>
+
+      <!-- Tarjeta estado actual -->
+      <div class="status-hoy">
+        <div class="status-indicator none" id="status-icon">🌡️</div>
+        <div class="status-info">
+          <h3 id="status-titulo">Sin lectura hoy</h3>
+          <p id="status-desc">Aún no has registrado tu temperatura hoy.</p>
+        </div>
+        <div class="temp-grande none" id="status-temp">--.-°</div>
+      </div>
+
+      <!-- Botón principal -->
+      <button class="btn-tomar" id="btn-tomar" onclick="abrirModal()">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M9 22h6" />
+        </svg>
+        Tomar temperatura ahora
+      </button>
+
+      <!-- Historial -->
+      <div class="section-title">Historial de lecturas</div>
+      <div class="historial-list" id="pac-historial">
+        <div class="empty-state">No hay lecturas registradas aún</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal de toma -->
+  <div class="modal-overlay" id="modal-toma">
+    <div class="modal">
+
+      <!-- Escaneando -->
+      <div id="modal-escaneando">
+        <h3>Midiendo temperatura</h3>
+        <p>Mantén la frente frente al sensor durante 3 segundos</p>
+        <div class="scanner-anim">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M9 22h6" />
+          </svg>
+        </div>
+        <p style="color:var(--text3);font-size:.8rem">Conectando con el sensor ESP32...</p>
+      </div>
+
+      <!-- Resultado -->
+      <div id="modal-resultado" style="display:none">
+        <h3>Lectura obtenida</h3>
+        <p>Confirma para guardar el registro</p>
+        <div class="modal-result" id="modal-temp-val">--.-°</div>
+        <div id="modal-badge-estado" style="margin-bottom:.5rem"></div>
+        <p class="modal-consejo" id="modal-consejo"></p>
+        <div class="modal-buttons">
+          <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+          <button class="btn-confirm" onclick="confirmarLectura()">Confirmar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <div class="toast-dot" id="toast-dot"></div>
+    <span id="toast-msg"></span>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/paciente.js"></script>
+
+  <script>
+    /* Esta página requiere sesión activa.
+       En producción: verificar sesión PHP aquí. */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!currentUser) {
+        /* Redirigir al login si no hay sesión */
+        /* window.location.href = 'login.html'; */
+      }
+    });
+  </script>
+</body>
+
+</html>
