@@ -201,7 +201,6 @@ function renderHistorial() {
 
 async function abrirModal() {
 
-  // 🔥 CONTROL ABSOLUTO (NO TOKEN SI YA HAY 3)
   if (!puedeTomarMedicion()) {
     showToast("Máximo de 3 mediciones alcanzado", "warn");
     return;
@@ -209,6 +208,7 @@ async function abrirModal() {
 
   lecturaTemp = null;
 
+  // 1. CREAR JOB EN BACKEND
   const res = await fetch(`${CONFIG.API_URL}/sesion-medicion`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -224,8 +224,11 @@ async function abrirModal() {
     return;
   }
 
+  // 2. GUARDAR TOKEN LOCAL
   sessionStorage.setItem("medicion_token", data.token);
 
+
+  // 3. UI
   document.getElementById('modal-toma').classList.add('open');
   document.getElementById('modal-escaneando').style.display = 'block';
   document.getElementById('modal-resultado').style.display = 'none';
