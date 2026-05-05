@@ -314,6 +314,19 @@ function cerrarModal() {
   }
 }
 
+function confirmarLectura() {
+  cerrarModal();
+
+  lecturaTemp = null;
+  sessionStorage.removeItem("medicion_token");
+
+  // 🔥 refrescar UI por seguridad
+  renderEstadoHoy();
+  renderHistorial();
+
+  showToast("Lectura confirmada", "ok");
+}
+
 /* ───────────── LOGOUT ───────────── */
 
 function logout() {
