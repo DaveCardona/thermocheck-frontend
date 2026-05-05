@@ -6,10 +6,9 @@ const sesion = sessionStorage.getItem('currentUser');
 if (!sesion) {
   window.location.replace('index.html');
 } else {
-  document.body.style.display = 'block'; //  mostrar solo si está autorizado
+  document.body.style.display = 'block';
 }
 
-//  PROTECCIÓN INMEDIATA (ANTES DE QUE RENDERICE NADA)
 if (!sessionStorage.getItem('currentUser')) {
   window.location.replace('index.html');
 }
@@ -34,30 +33,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function obtenerIniciales(nombreCompleto) {
   if (!nombreCompleto) return "--";
-
   const partes = nombreCompleto.trim().split(" ");
   if (partes.length === 1) return partes[0][0].toUpperCase();
-
   return (partes[0][0] + partes[1][0]).toUpperCase();
 }
 
-/* ───────────── UTILS EXTRA ───────────── */
-
-//  convierte fecha actual a formato YYYY-MM-DD
 function hoyISO() {
   return new Date().toISOString().split("T")[0];
 }
 
-//  clasifica temperatura
 function clasificarTemp(temp) {
   if (temp >= 37.5) return 'fiebre';
   return 'normal';
 }
 
-//  formatea fecha YYYY-MM-DD a formato bonito
 function formatFecha(fechaISO) {
   const fecha = new Date(fechaISO);
-
   return fecha.toLocaleDateString('es-CO', {
     day: '2-digit',
     month: 'short',
@@ -65,8 +56,7 @@ function formatFecha(fechaISO) {
   });
 }
 
-
-/* ───────────── CONTROL CENTRAL  ───────────── */
+/* ───────────── CONTROL ───────────── */
 
 function puedeTomarMedicion() {
   const hoy = hoyISO();
@@ -121,82 +111,6 @@ async function cargarMedidas() {
   }
 }
 
-/* ───────────── ESTADO HOY ───────────── */
-
-function renderEstadoHoy() {
-  const btn = document.getElementById('btn-tomar');
-
-  if (!puedeTomarMedicion()) {
-    btn.innerHTML = "Máximo de mediciones alcanzado";
-    btn.className = "btn-tomar tomada";
-    btn.disabled = true;
-    btn.onclick = null;
-
-    // refuerzo visual
-    document.getElementById('status-titulo').textContent = "Límite alcanzado";
-    document.getElementById('status-desc').textContent = "Ya realizaste 3 mediciones hoy.";
-
-    return;
-  }
-
-  const hoy = hoyISO();
-  const lecturasHoy = medidas
-    .filter(m => m.fecha === hoy)
-    .sort((a, b) => b.hora.localeCompare(a.hora));
-
-  const ultima = lecturasHoy[0];
-
-  if (ultima) {
-    const info = getEstadoInfo(ultima.estado);
-
-    document.getElementById('status-icon').className = 'status-indicator ' + info.clase;
-    document.getElementById('status-icon').textContent = ultima.estado === 'normal' ? '✓' : '⚠';
-
-    document.getElementById('status-titulo').textContent = info.label;
-    document.getElementById('status-desc').textContent = info.consejo;
-
-    document.getElementById('status-temp').textContent = ultima.temp.toFixed(1) + '°C';
-
-    btn.className = 'btn-tomar tomada';
-    btn.innerHTML = "Tomar otra medición";
-    btn.onclick = abrirModal;
-    btn.disabled = false;
-
-  } else {
-    btn.className = 'btn-tomar';
-    btn.innerHTML = "Tomar temperatura ahora";
-    btn.onclick = abrirModal;
-  }
-}
-
-/* ───────────── HISTORIAL ───────────── */
-
-function renderHistorial() {
-  const el = document.getElementById('pac-historial');
-
-  if (!medidas.length) {
-    el.innerHTML = '<div class="empty-state">No hay lecturas registradas</div>';
-    return;
-  }
-
-  el.innerHTML = medidas.map(m => {
-    const info = getEstadoInfo(m.estado);
-
-    return `
-    <div class="historial-item">
-      <div class="dot ${info.clase}"></div>
-      <div class="h-fecha">${formatFecha(m.fecha)} — ${m.hora}</div>
-      <div class="h-temp" style="color:${info.color}">
-        ${m.temp.toFixed(1)}°C
-      </div>
-      <span class="badge-estado ${info.clase}">
-        ${info.label}
-      </span>
-    </div>
-    `;
-  }).join('');
-}
-
 /* ───────────── MODAL ───────────── */
 
 async function abrirModal() {
@@ -208,7 +122,6 @@ async function abrirModal() {
 
   lecturaTemp = null;
 
-  // 1. CREAR SESIÓN (JOB)
   const res = await fetch(`${CONFIG.API_URL}/sesion-medicion`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -226,12 +139,59 @@ async function abrirModal() {
 
   sessionStorage.setItem("medicion_token", data.token);
 
-  // 2. UI ESPERA REAL (NO SIMULACIÓN)
   document.getElementById('modal-toma').classList.add('open');
   document.getElementById('modal-escaneando').style.display = 'block';
   document.getElementById('modal-resultado').style.display = 'none';
 
   showToast("Esperando dispositivo...", "info");
+
+  iniciarPolling();
+}
+
+/* ───────────── POLLING PRO ───────────── */
+
+let pollingInterval = null;
+
+function iniciarPolling() {
+
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+  }
+
+  const token = sessionStorage.getItem("medicion_token");
+  const TIMEOUT = 20000;
+  const start = Date.now();
+
+  pollingInterval = setInterval(async () => {
+    try {
+
+      // timeout
+      if (Date.now() - start > TIMEOUT) {
+        clearInterval(pollingInterval);
+        showToast("Tiempo de espera agotado", "warn");
+        cerrarModal();
+        return;
+      }
+
+      const res = await fetch(`${CONFIG.API_URL}/medicion-estado/${token}`);
+      const data = await res.json();
+
+      if (!data.success) return;
+
+      if (data.estado === "completado") {
+        clearInterval(pollingInterval);
+
+        mostrarResultadoModal(parseFloat(data.temperatura));
+
+        sessionStorage.removeItem("medicion_token");
+
+        showToast("Medición recibida", "ok");
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  }, 2000);
 }
 
 /* ───────────── RESULTADO ───────────── */
@@ -254,66 +214,20 @@ function mostrarResultadoModal(temp) {
   document.getElementById('modal-consejo').textContent = info.consejo;
 }
 
-/* ───────────── GUARDAR ───────────── */
-
-async function confirmarLectura() {
-  try {
-    const token = sessionStorage.getItem("medicion_token");
-
-    const res = await fetch(`${CONFIG.API_URL}/medidas`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token,
-        temperatura: lecturaTemp
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      showToast(data.message, "warn");
-      return;
-    }
-
-    showToast("Temperatura guardada", "ok");
-
-    sessionStorage.removeItem("medicion_token");
-
-    cerrarModal();
-
-    await cargarMedidas();
-    renderEstadoHoy();
-    renderHistorial();
-
-  } catch (error) {
-    console.error(error);
-    showToast("Error servidor", "error");
-  }
-}
-
-/* ───────────── CERRAR MODAL ───────────── */
+/* ───────────── CIERRE ───────────── */
 
 function cerrarModal() {
   document.getElementById('modal-toma').classList.remove('open');
+
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+  }
 }
 
 /* ───────────── LOGOUT ───────────── */
 
 function logout() {
-  // borrar sesión
   sessionStorage.removeItem("currentUser");
   sessionStorage.removeItem("medicion_token");
-
-  // redirigir
   window.location.href = "index.html";
 }
-
-window.addEventListener('pageshow', function (event) {
-  if (event.persisted || window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
-    
-    if (!sessionStorage.getItem('currentUser')) {
-      window.location.replace('index.html');
-    }
-  }
-});
