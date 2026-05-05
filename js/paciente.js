@@ -208,7 +208,7 @@ async function abrirModal() {
 
   lecturaTemp = null;
 
-  // 1. CREAR JOB EN BACKEND
+  // 1. CREAR SESIÓN (JOB)
   const res = await fetch(`${CONFIG.API_URL}/sesion-medicion`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -224,19 +224,14 @@ async function abrirModal() {
     return;
   }
 
-  // 2. GUARDAR TOKEN LOCAL
   sessionStorage.setItem("medicion_token", data.token);
 
-
-  // 3. UI
+  // 2. UI ESPERA REAL (NO SIMULACIÓN)
   document.getElementById('modal-toma').classList.add('open');
   document.getElementById('modal-escaneando').style.display = 'block';
   document.getElementById('modal-resultado').style.display = 'none';
 
-  setTimeout(() => {
-    const temp = +(35.5 + Math.random() * 4).toFixed(1);
-    mostrarResultadoModal(temp);
-  }, 2000);
+  showToast("Esperando dispositivo...", "info");
 }
 
 /* ───────────── RESULTADO ───────────── */
