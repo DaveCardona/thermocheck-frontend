@@ -1,5 +1,6 @@
 let lecturaTemp = null;
 let medidas = [];
+let pollingInterval = null;
 
 const sesion = sessionStorage.getItem('currentUser');
 
@@ -9,6 +10,7 @@ if (!sesion) {
   document.body.style.display = 'block';
 }
 
+// protección extra
 if (!sessionStorage.getItem('currentUser')) {
   window.location.replace('index.html');
 }
@@ -67,8 +69,11 @@ function puedeTomarMedicion() {
 /* ───────────── INIT ───────────── */
 
 function initPaciente() {
-  document.getElementById('pac-avatar').textContent = obtenerIniciales(currentUser.nombre_completo);
-  document.getElementById('pac-nombre').textContent = currentUser.nombre;
+  document.getElementById('pac-avatar').textContent =
+    obtenerIniciales(currentUser.nombre_completo);
+
+  document.getElementById('pac-nombre').textContent =
+    currentUser.nombre;
 
   document.getElementById('pac-fecha-hoy').textContent =
     new Date().toLocaleDateString('es-CO', {
@@ -111,6 +116,85 @@ async function cargarMedidas() {
   }
 }
 
+/* ───────────── ESTADO HOY ───────────── */
+
+function renderEstadoHoy() {
+  const btn = document.getElementById('btn-tomar');
+
+  if (!puedeTomarMedicion()) {
+    btn.innerHTML = "Máximo de mediciones alcanzado";
+    btn.className = "btn-tomar tomada";
+    btn.disabled = true;
+    btn.onclick = null;
+
+    document.getElementById('status-titulo').textContent = "Límite alcanzado";
+    document.getElementById('status-desc').textContent = "Ya realizaste 3 mediciones hoy.";
+
+    return;
+  }
+
+  const hoy = hoyISO();
+  const lecturasHoy = medidas
+    .filter(m => m.fecha === hoy)
+    .sort((a, b) => b.hora.localeCompare(a.hora));
+
+  const ultima = lecturasHoy[0];
+
+  if (ultima) {
+    const info = getEstadoInfo(ultima.estado);
+
+    document.getElementById('status-icon').className =
+      'status-indicator ' + info.clase;
+
+    document.getElementById('status-icon').textContent =
+      ultima.estado === 'normal' ? '✓' : '⚠';
+
+    document.getElementById('status-titulo').textContent = info.label;
+    document.getElementById('status-desc').textContent = info.consejo;
+
+    document.getElementById('status-temp').textContent =
+      ultima.temp.toFixed(1) + '°C';
+
+    btn.className = 'btn-tomar tomada';
+    btn.innerHTML = "Tomar otra medición";
+    btn.onclick = abrirModal;
+    btn.disabled = false;
+
+  } else {
+    btn.className = 'btn-tomar';
+    btn.innerHTML = "Tomar temperatura ahora";
+    btn.onclick = abrirModal;
+  }
+}
+
+/* ───────────── HISTORIAL ───────────── */
+
+function renderHistorial() {
+  const el = document.getElementById('pac-historial');
+
+  if (!medidas.length) {
+    el.innerHTML = '<div class="empty-state">No hay lecturas registradas</div>';
+    return;
+  }
+
+  el.innerHTML = medidas.map(m => {
+    const info = getEstadoInfo(m.estado);
+
+    return `
+    <div class="historial-item">
+      <div class="dot ${info.clase}"></div>
+      <div class="h-fecha">${formatFecha(m.fecha)} — ${m.hora}</div>
+      <div class="h-temp" style="color:${info.color}">
+        ${m.temp.toFixed(1)}°C
+      </div>
+      <span class="badge-estado ${info.clase}">
+        ${info.label}
+      </span>
+    </div>
+    `;
+  }).join('');
+}
+
 /* ───────────── MODAL ───────────── */
 
 async function abrirModal() {
@@ -148,9 +232,7 @@ async function abrirModal() {
   iniciarPolling();
 }
 
-/* ───────────── POLLING PRO ───────────── */
-
-let pollingInterval = null;
+/* ───────────── POLLING ───────────── */
 
 function iniciarPolling() {
 
@@ -165,7 +247,6 @@ function iniciarPolling() {
   pollingInterval = setInterval(async () => {
     try {
 
-      // timeout
       if (Date.now() - start > TIMEOUT) {
         clearInterval(pollingInterval);
         showToast("Tiempo de espera agotado", "warn");
@@ -174,6 +255,9 @@ function iniciarPolling() {
       }
 
       const res = await fetch(`${CONFIG.API_URL}/medicion-estado/${token}`);
+
+      if (res.status === 404) return;
+
       const data = await res.json();
 
       if (!data.success) return;
@@ -181,9 +265,15 @@ function iniciarPolling() {
       if (data.estado === "completado") {
         clearInterval(pollingInterval);
 
-        mostrarResultadoModal(parseFloat(data.temperatura));
+        if (data.temperatura !== null) {
+          mostrarResultadoModal(parseFloat(data.temperatura));
+        }
 
         sessionStorage.removeItem("medicion_token");
+
+        await cargarMedidas();
+        renderEstadoHoy();
+        renderHistorial();
 
         showToast("Medición recibida", "ok");
       }
@@ -231,3 +321,13 @@ function logout() {
   sessionStorage.removeItem("medicion_token");
   window.location.href = "index.html";
 }
+
+window.addEventListener('pageshow', function (event) {
+  if (event.persisted ||
+      window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+
+    if (!sessionStorage.getItem('currentUser')) {
+      window.location.replace('index.html');
+    }
+  }
+});
