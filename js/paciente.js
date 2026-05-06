@@ -106,7 +106,7 @@ async function cargarMedidas() {
     }
 
     medidas = data.data.map(m => {
-      const fechaObj = new Date(m.fecha);
+      const fechaObj = new Date(m.fecha.replace('Z', ''));
 
       return {
         temp: parseFloat(m.temperatura),
