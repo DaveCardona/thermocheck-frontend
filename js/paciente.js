@@ -110,24 +110,20 @@ async function cargarMedidas() {
 
     medidas = data.data.map(m => {
 
-      const fechaRaw = m.fecha;
+      const fechaRaw = m.created_at; //  CAMBIO CLAVE
 
-      const [fechaPart, horaPart] = fechaRaw.split(' ');
-      const [year, month, day] = fechaPart.split('-');
-      const [hour, minute, second] = horaPart.split(':');
+      const fechaObj = new Date(fechaRaw);
 
-      const fechaObj = new Date(
-        year,
-        month - 1,
-        day,
-        hour,
-        minute,
-        second
-      );
+      const year = fechaObj.getFullYear();
+      const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const day = String(fechaObj.getDate()).padStart(2, '0');
+
+      const hour = String(fechaObj.getHours()).padStart(2, '0');
+      const minute = String(fechaObj.getMinutes()).padStart(2, '0');
 
       return {
         temp: parseFloat(m.temperatura),
-        fecha: `${year}-${month}-${day}`, //  importante
+        fecha: `${year}-${month}-${day}`,
         hora: `${hour}:${minute}`,
         estado: clasificarTemp(parseFloat(m.temperatura))
       };
