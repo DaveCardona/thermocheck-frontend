@@ -109,11 +109,15 @@ async function cargarMedidas() {
     }
 
     medidas = data.data.map(m => {
-      const fechaObj = new Date(m.fecha.replace('Z', ''));
+      const fechaObj = new Date(m.fecha);
+
+      const year = fechaObj.getFullYear();
+      const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const day = String(fechaObj.getDate()).padStart(2, '0');
 
       return {
         temp: parseFloat(m.temperatura),
-        fecha: `${fechaObj.getFullYear()}-${String(fechaObj.getMonth() + 1).padStart(2, '0')}-${String(fechaObj.getDate()).padStart(2, '0')}`,
+        fecha: `${year}-${month}-${day}`,
         hora: fechaObj.toTimeString().slice(0, 5),
         estado: clasificarTemp(parseFloat(m.temperatura))
       };
@@ -346,7 +350,7 @@ function logout() {
 
 window.addEventListener('pageshow', function (event) {
   if (event.persisted ||
-      window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+    window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
 
     if (!sessionStorage.getItem('currentUser')) {
       window.location.replace('index.html');
