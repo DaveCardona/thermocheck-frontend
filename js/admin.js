@@ -58,6 +58,11 @@ function initAdmin() {
   }, 10000);
 }
 
+function getFechaLocalISO(fechaISO) {
+  // corta solo la parte de fecha sin tocar zona
+  return fechaISO.split('T')[0];
+}
+
 /* ── STATS (DESDE BACKEND) ── */
 async function renderAdminStats() {
   try {
@@ -163,7 +168,8 @@ async function renderAdminTabla() {
         const estado = temp >= 37.5 ? 'fiebre' : 'normal';
         const info = getEstadoInfo(estado);
 
-        const fechaObj = new Date(l.fecha);
+        const fechaLocal = l.fecha.replace('Z', ''); 
+        const fechaObj = new Date(fechaLocal);
 
         return `
     <tr onclick="verDetalle(${l.id_medida})">
