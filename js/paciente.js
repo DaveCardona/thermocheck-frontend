@@ -41,13 +41,7 @@ function obtenerIniciales(nombreCompleto) {
 }
 
 function hoyISO() {
-  const hoy = new Date();
-
-  const year = hoy.getFullYear();
-  const month = String(hoy.getMonth() + 1).padStart(2, '0');
-  const day = String(hoy.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
+  return new Date().toISOString().split("T")[0];
 }
 
 function clasificarTemp(temp) {
@@ -56,10 +50,7 @@ function clasificarTemp(temp) {
 }
 
 function formatFecha(fechaISO) {
-  const [year, month, day] = fechaISO.split('-');
-
-  const fecha = new Date(year, month - 1, day); //  LOCAL
-
+  const fecha = new Date(fechaISO);
   return fecha.toLocaleDateString('es-CO', {
     day: '2-digit',
     month: 'short',
@@ -109,23 +100,12 @@ async function cargarMedidas() {
     }
 
     medidas = data.data.map(m => {
-
-      //  QUITAMOS LA Z (evita conversión UTC)
-      const fechaLocal = m.fecha.replace('Z', '');
-
-      const fechaObj = new Date(fechaLocal);
-
-      const year = fechaObj.getFullYear();
-      const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
-      const day = String(fechaObj.getDate()).padStart(2, '0');
-
-      const hour = String(fechaObj.getHours()).padStart(2, '0');
-      const minute = String(fechaObj.getMinutes()).padStart(2, '0');
+      const fechaObj = new Date(m.fecha);
 
       return {
         temp: parseFloat(m.temperatura),
-        fecha: `${year}-${month}-${day}`,
-        hora: `${hour}:${minute}`,
+        fecha: fechaObj.toISOString().split("T")[0],
+        hora: fechaObj.toTimeString().slice(0, 5),
         estado: clasificarTemp(parseFloat(m.temperatura))
       };
     });
@@ -357,7 +337,7 @@ function logout() {
 
 window.addEventListener('pageshow', function (event) {
   if (event.persisted ||
-    window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+      window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
 
     if (!sessionStorage.getItem('currentUser')) {
       window.location.replace('index.html');
