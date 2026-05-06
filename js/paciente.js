@@ -109,16 +109,26 @@ async function cargarMedidas() {
     }
 
     medidas = data.data.map(m => {
-      const fechaObj = new Date(m.fecha);
 
-      const year = fechaObj.getFullYear();
-      const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
-      const day = String(fechaObj.getDate()).padStart(2, '0');
+      const fechaRaw = m.fecha;
+
+      const [fechaPart, horaPart] = fechaRaw.split(' ');
+      const [year, month, day] = fechaPart.split('-');
+      const [hour, minute, second] = horaPart.split(':');
+
+      const fechaObj = new Date(
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        second
+      );
 
       return {
         temp: parseFloat(m.temperatura),
-        fecha: `${year}-${month}-${day}`,
-        hora: fechaObj.toTimeString().slice(0, 5),
+        fecha: `${year}-${month}-${day}`, //  importante
+        hora: `${hour}:${minute}`,
         estado: clasificarTemp(parseFloat(m.temperatura))
       };
     });
