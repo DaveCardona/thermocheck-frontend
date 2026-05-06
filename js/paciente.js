@@ -110,9 +110,10 @@ async function cargarMedidas() {
 
     medidas = data.data.map(m => {
 
-      const fechaRaw = m.created_at; //  CAMBIO CLAVE
+      const fechaRaw = m.created_at;
 
-      const fechaObj = new Date(fechaRaw);
+      //  FORZAR ZONA HORARIA COLOMBIA
+      const fechaObj = new Date(fechaRaw.replace(' ', 'T') + '-05:00');
 
       const year = fechaObj.getFullYear();
       const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
