@@ -41,7 +41,13 @@ function obtenerIniciales(nombreCompleto) {
 }
 
 function hoyISO() {
-  return new Date().toISOString().split("T")[0];
+  const hoy = new Date();
+
+  const year = hoy.getFullYear();
+  const month = String(hoy.getMonth() + 1).padStart(2, '0');
+  const day = String(hoy.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }
 
 function clasificarTemp(temp) {
@@ -104,7 +110,7 @@ async function cargarMedidas() {
 
       return {
         temp: parseFloat(m.temperatura),
-        fecha: fechaObj.toISOString().split("T")[0],
+        fecha: `${fechaObj.getFullYear()}-${String(fechaObj.getMonth() + 1).padStart(2, '0')}-${String(fechaObj.getDate()).padStart(2, '0')}`,
         hora: fechaObj.toTimeString().slice(0, 5),
         estado: clasificarTemp(parseFloat(m.temperatura))
       };
