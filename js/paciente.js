@@ -56,7 +56,10 @@ function clasificarTemp(temp) {
 }
 
 function formatFecha(fechaISO) {
-  const fecha = new Date(fechaISO);
+  const [year, month, day] = fechaISO.split('-');
+
+  const fecha = new Date(year, month - 1, day); //  LOCAL
+
   return fecha.toLocaleDateString('es-CO', {
     day: '2-digit',
     month: 'short',
