@@ -320,7 +320,7 @@ function confirmarLectura() {
   lecturaTemp = null;
   sessionStorage.removeItem("medicion_token");
 
-  // 🔥 refrescar UI por seguridad
+  // refrescar UI por seguridad
   renderEstadoHoy();
   renderHistorial();
 
@@ -337,7 +337,7 @@ function logout() {
 
 window.addEventListener('pageshow', function (event) {
   if (event.persisted ||
-      window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+    window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
 
     if (!sessionStorage.getItem('currentUser')) {
       window.location.replace('index.html');

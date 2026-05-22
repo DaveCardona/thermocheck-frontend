@@ -32,10 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ── Tabs ── */
 function switchLoginTab(tab) {
   loginTab = tab;
+
   const tPac = document.getElementById('tab-paciente');
   const tAdm = document.getElementById('tab-admin');
+
   if (tPac) tPac.classList.toggle('active', tab === 'paciente');
   if (tAdm) tAdm.classList.toggle('active', tab === 'admin');
+
   ocultarErrorLogin();
 }
 
@@ -48,12 +51,16 @@ async function doLogin() {
   const password = passEl.value;
 
   try {
-    const res = await fetch("https://themocheck-backend-production.up.railway.app/login", {
+
+    const res = await fetch(`${CONFIG.API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({
+        username,
+        password
+      })
     });
 
     const data = await res.json();
@@ -65,7 +72,7 @@ async function doLogin() {
 
     const user = data.user;
 
-    // 🔥 Validación por pestaña
+    //  Validación por pestaña
     if (loginTab === 'admin' && user.id_rol !== 2) {
       mostrarErrorLogin('No tienes permisos de administrador');
       return;
@@ -77,7 +84,10 @@ async function doLogin() {
     }
 
     // Guardar sesión
-    sessionStorage.setItem('currentUser', JSON.stringify(user));
+    sessionStorage.setItem(
+      'currentUser',
+      JSON.stringify(user)
+    );
 
     // Redirección
     if (user.id_rol === 2) {
@@ -103,30 +113,37 @@ function _redirigirPorRol(id_rol) {
 /* ── Errores ── */
 function mostrarErrorLogin(msg) {
   const e = document.getElementById('login-error');
+
   if (!e) return;
-  e.textContent   = msg;
+
+  e.textContent = msg;
   e.style.display = 'block';
 }
 
 function ocultarErrorLogin() {
   const e = document.getElementById('login-error');
-  if (e) e.style.display = 'none';
+
+  if (e) {
+    e.style.display = 'none';
+  }
 }
 
 /* ── Logout (llamado desde cualquier página) ── */
 function logout() {
   currentUser = null;
+
   sessionStorage.clear();
 
   //  Evita volver con botón atrás
   window.location.replace('index.html');
 }
 
-
-
 /* ── Enter para submit (solo en login.html) ── */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('screen-login')) {
+  if (
+    e.key === 'Enter' &&
+    document.getElementById('screen-login')
+  ) {
     doLogin();
   }
 });

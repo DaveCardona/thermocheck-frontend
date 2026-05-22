@@ -28,7 +28,17 @@
         <div class="avatar" id="admin-avatar"></div>
         <span id="admin-nombre"></span>
       </div>
-      <button class="btn-logout" onclick="logout()">Salir</button>
+      <div class="topbar-actions">
+
+        <button class="btn-admin-panel" onclick="mostrarPanelAdmin()">
+          ⚙ Administración
+        </button>
+
+        <button class="btn-logout" onclick="logout()">
+          Salir
+        </button>
+
+      </div>
     </div>
 
     <!-- Contenido -->
@@ -106,6 +116,164 @@
         </div>
       </div>
 
+      <div id="panel-admin-config" class="modal">
+
+        <div class="modal-content modal-admin">
+
+          <div class="modal-header">
+
+            <h3>
+              ⚙ Panel de administración
+            </h3>
+
+            <button onclick="cerrarPanelAdmin()">
+              ✕
+            </button>
+
+          </div>
+
+          <div class="modal-body">
+
+            <!-- Empresas -->
+
+            <div class="tabla-wrap">
+
+              <div class="tabla-header">
+
+                <h3>Empresas</h3>
+
+                <div class="tabla-controls">
+
+                  <input type="search" id="buscar-empresa-admin" class="tabla-search" placeholder="Buscar empresa..."
+                    oninput="cargarEmpresasAdmin()">
+
+                  <select id="estado-empresa-admin" class="tabla-search" onchange="cargarEmpresasAdmin()">
+
+                    <option value="">
+                      Todos
+                    </option>
+
+                    <option value="true">
+                      Activas
+                    </option>
+
+                    <option value="false">
+                      Inactivas
+                    </option>
+
+                  </select>
+
+                  <button class="btn-admin-add" onclick="abrirModalEmpresa()">
+
+                    + Nueva empresa
+
+                  </button>
+
+                </div>
+
+              </div>
+
+              <table>
+
+                <thead>
+
+                  <tr>
+                    <th>Empresa</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+
+                </thead>
+
+                <tbody id="empresa-body">
+                </tbody>
+
+              </table>
+
+              <div class="paginacion">
+                <span id="empresa-pag-info">
+                  Mostrando 0 de 0 registros
+                </span>
+
+                <div id="empresa-pag-btns" class="pag-btns">
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- Usuarios -->
+
+            <div class="tabla-wrap">
+
+              <div class="tabla-header">
+
+                <h3>Usuarios</h3>
+
+                <div class="tabla-controls">
+
+                  <input type="search" id="buscar-usuario-admin" class="tabla-search" placeholder="Buscar usuario..."
+                    oninput="cargarUsuariosAdmin()">
+
+                  <select id="estado-usuario-admin" class="tabla-search" onchange="cargarUsuariosAdmin()">
+
+                    <option value="">
+                      Todos
+                    </option>
+
+                    <option value="true">
+                      Activos
+                    </option>
+
+                    <option value="false">
+                      Inactivos
+                    </option>
+
+                  </select>
+
+                </div>
+              </div>
+
+
+              <table>
+
+                <thead>
+
+                  <tr>
+
+                    <th>Nombre</th>
+                    <th>Usuario</th>
+                    <th>Empresa</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody id="usuarios-body">
+
+                </tbody>
+
+              </table>
+
+              <div class="paginacion">
+                <span id="usuario-pag-info">
+                  Mostrando 0 de 0 registros
+                </span>
+
+                <div id="usuario-pag-btns" class="pag-btns">
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -120,6 +288,7 @@
   <script src="js/login.js"></script>
   <script src="js/admin.js"></script>
 
+  <!-- MODAL DETALLE PACIENTE -->
   <div id="modal-detalle" class="modal">
     <div class="modal-content">
 
@@ -133,6 +302,156 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR EMPRESA -->
+  <div id="modal-empresa" class="modal">
+
+    <div class="modal-content" style="width:500px">
+
+      <div class="modal-header">
+
+        <h3 id="empresa-modal-title">
+          Nueva empresa
+        </h3>
+
+        <button onclick="cerrarModalEmpresa()">
+          ✕
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <input type="text" id="empresa-nombre" class="tabla-search" placeholder="Nombre empresa"
+          style="width:100%;margin-bottom:1rem">
+
+        <button class="btn-admin-add" onclick="guardarEmpresa()">
+
+          Guardar
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL EDITAR USUARIO -->
+  <div id="modal-usuario" class="modal">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h3>
+          Editar usuario
+        </h3>
+
+        <button onclick="cerrarModalUsuario()">
+
+          ✕
+
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div class="modal-grid">
+
+          <input id="u-nombre" class="tabla-search" placeholder="Nombre">
+
+          <input id="u-apellido" class="tabla-search" placeholder="Apellido">
+
+          <input id="u-tipo" class="tabla-search" placeholder="Buscar tipo documento" list="lista-tipos" />
+
+          <datalist id="lista-tipos"></datalist>
+
+          <input id="u-documento" class="tabla-search" placeholder="Número documento">
+
+          <input id="u-direccion" class="tabla-search" placeholder="Dirección">
+
+          <input id="u-celular" class="tabla-search" placeholder="Celular">
+
+          <input id="u-empresa" class="tabla-search" placeholder="Buscar empresa" list="lista-empresas" />
+
+          <datalist id="lista-empresas"></datalist>
+
+          </select>
+
+        </div>
+
+        <div class="modal-actions">
+
+          <button class="btn-cancelar" onclick="
+cerrarModalUsuario()
+">
+
+            Cancelar
+
+          </button>
+
+          <button class="btn-confirmar" onclick="
+confirmarGuardarUsuario()
+">
+
+            Guardar
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MODAL CONFIRMACIÓN -->
+
+  <div id="modal-confirmar" class="modal">
+
+    <div class="modal-content" style="width:450px">
+
+      <div class="modal-header">
+
+        <h3>
+          Confirmar acción
+        </h3>
+
+        <button onclick="cerrarConfirmacion()">
+          ✕
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <p id="confirm-text"></p>
+
+        <div class="modal-actions">
+
+          <button class="btn-cancelar" onclick="cerrarConfirmacion()">
+
+            Cancelar
+
+          </button>
+
+          <button class="btn-confirmar" id="confirm-btn">
+
+            Confirmar
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 </body>
 
