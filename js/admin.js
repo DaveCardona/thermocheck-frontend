@@ -7,6 +7,14 @@ let adminPagina = 1;
 const ADMIN_PPP = 8;
 let adminInterval = null;
 
+/* PAGINACIÓN ADMIN */
+
+const ADMIN_EMPRESAS_PPP = 10;
+const ADMIN_USUARIOS_PPP = 10;
+
+let empresaPagina = 1;
+let usuarioPagina = 1;
+
 /* ── Init: restaurar sesión ── */
 document.addEventListener('DOMContentLoaded', () => {
   const sesion = sessionStorage.getItem('currentUser');
@@ -168,7 +176,7 @@ async function renderAdminTabla() {
         const estado = temp >= 37.5 ? 'fiebre' : 'normal';
         const info = getEstadoInfo(estado);
 
-        const fechaLocal = l.fecha.replace('Z', ''); 
+        const fechaLocal = l.fecha.replace('Z', '');
         const fechaObj = new Date(fechaLocal);
 
         return `
@@ -315,4 +323,922 @@ function abrirModal(item) {
 
 function cerrarModal() {
   document.getElementById('modal-detalle').classList.remove('active');
+}
+
+function mostrarPanelAdmin() {
+
+  document
+    .getElementById(
+      'panel-admin-config'
+    )
+    .classList.add(
+      'active'
+    );
+
+  cargarEmpresasAdmin();
+  cargarUsuariosAdmin();
+
+}
+
+function cerrarPanelAdmin() {
+
+  document
+    .getElementById(
+      'panel-admin-config'
+    )
+    .classList.remove(
+      'active'
+    );
+
+}
+
+function renderUsuarios(lista) {
+
+  const totalPags =
+    Math.max(
+      1,
+      Math.ceil(
+        lista.length /
+        ADMIN_USUARIOS_PPP
+      )
+    );
+
+  if (
+    usuarioPagina >
+    totalPags
+  ) {
+    usuarioPagina =
+      totalPags;
+  }
+
+  const slice =
+    lista.slice(
+      (usuarioPagina - 1)
+      *
+      ADMIN_USUARIOS_PPP,
+
+      usuarioPagina *
+      ADMIN_USUARIOS_PPP
+    );
+
+  const tbody =
+    document.getElementById(
+      "usuarios-body"
+    );
+
+  tbody.innerHTML =
+    slice.map(u => `
+
+<tr>
+
+<td>
+${u.nombre}
+${u.apellido}
+</td>
+
+<td>
+${u.username}
+</td>
+
+<td>
+${u.empresa || "-"}
+</td>
+
+<td>
+
+<span class="
+badge-estado
+${u.activo ? "normal" : "fiebre"}
+">
+
+${u.activo ?
+        "Activo" :
+        "Inactivo"}
+
+</span>
+
+</td>
+
+<td>
+
+<button
+class="btn-editar"
+onclick="
+editarUsuario(
+${u.id_usuario}
+)
+">
+
+Editar
+
+</button>
+
+<button
+class="btn-estado"
+onclick="
+cambiarEstadoUsuario(
+${u.id_usuario}
+)
+">
+
+${u.activo ?
+        "Inactivar" :
+        "Activar"}
+
+</button>
+
+</td>
+
+</tr>
+
+`).join("");
+
+  renderPaginacionAdmin(
+    "usuario-pag-btns",
+    "usuario-pag-info",
+    lista.length,
+    slice.length,
+    totalPags,
+    usuarioPagina,
+    (p) => {
+
+      usuarioPagina = p;
+      renderUsuarios(lista);
+
+    }
+  );
+}
+
+
+
+function renderEmpresas(lista) {
+
+  const totalPags =
+    Math.max(
+      1,
+      Math.ceil(
+        lista.length /
+        ADMIN_EMPRESAS_PPP
+      )
+    );
+
+  if (
+    empresaPagina >
+    totalPags
+  ) {
+    empresaPagina =
+      totalPags;
+  }
+
+  const slice =
+    lista.slice(
+      (empresaPagina - 1)
+      *
+      ADMIN_EMPRESAS_PPP,
+
+      empresaPagina *
+      ADMIN_EMPRESAS_PPP
+    );
+
+  const tbody =
+    document.getElementById(
+      "empresa-body"
+    );
+
+  tbody.innerHTML =
+    slice.map(e => `
+
+<tr>
+
+<td>${e.nombre}</td>
+
+<td>
+
+<span class="
+badge-estado
+${e.activo ? "normal" : "fiebre"}
+">
+
+${e.activo ? "Activa" : "Inactiva"}
+
+</span>
+
+</td>
+
+<td>
+
+<button
+class="btn-editar"
+onclick="
+editarEmpresa(
+${e.id_empresa},
+'${e.nombre}'
+)
+">
+Editar
+</button>
+
+<button
+class="btn-estado"
+onclick="
+cambiarEstadoEmpresa(
+${e.id_empresa}
+)
+">
+${e.activo ? "Inactivar" : "Activar"}
+</button>
+
+</td>
+
+</tr>
+
+`).join("");
+
+  renderPaginacionAdmin(
+    "empresa-pag-btns",
+    "empresa-pag-info",
+    lista.length,
+    slice.length,
+    totalPags,
+    empresaPagina,
+    (p) => {
+
+      empresaPagina = p;
+      renderEmpresas(lista);
+
+    }
+  );
+}
+
+function renderPaginacionAdmin(
+  contenedor,
+  infoId,
+  totalRegistros,
+  registrosPagina,
+  totalPags,
+  paginaActual,
+  callback
+) {
+
+  const pag =
+    document.getElementById(contenedor);
+
+  pag.innerHTML = "";
+
+  // texto "Mostrando X de Y"
+  document.getElementById(
+    infoId
+  ).textContent =
+    `Mostrando ${registrosPagina} de ${totalRegistros} registros`;
+
+  const crear = (
+    txt,
+    accion,
+    disabled = false,
+    active = false
+  ) => {
+
+    const btn =
+      document.createElement("button");
+
+    btn.className =
+      `pag-btn ${active ? "active" : ""
+      }`;
+
+    btn.textContent = txt;
+
+    btn.onclick = accion;
+
+    if (disabled) {
+      btn.style.opacity = ".35";
+    }
+
+    return btn;
+
+  };
+
+  // botón atrás
+  pag.appendChild(
+    crear(
+      "←",
+      () => callback(
+        paginaActual - 1
+      ),
+      paginaActual === 1
+    )
+  );
+
+  // páginas
+  for (let i = 1; i <= totalPags; i++) {
+
+    pag.appendChild(
+
+      crear(
+        i,
+        () => callback(i),
+        false,
+        i === paginaActual
+      )
+
+    );
+
+  }
+
+  // botón siguiente
+  pag.appendChild(
+
+    crear(
+      "→",
+      () => callback(
+        paginaActual + 1
+      ),
+      paginaActual === totalPags
+    )
+
+  );
+
+}
+
+async function cambiarEstadoEmpresa(id) {
+
+  abrirConfirmacion(
+    "¿Seguro que deseas cambiar el estado de esta empresa?",
+    async () => {
+
+      await fetch(
+        `${CONFIG.API_URL}/admin/empresas/${id}/estado`,
+        {
+          method: "PUT"
+        }
+      );
+
+      cargarEmpresasAdmin();
+
+    });
+
+}
+
+
+
+async function editarEmpresa(
+  id,
+  nombreActual
+) {
+
+  const nombre =
+    prompt(
+      "Nuevo nombre:",
+      nombreActual
+    );
+
+  if (!nombre) return;
+
+  await fetch(
+    `${CONFIG.API_URL}/admin/empresas/${id}`,
+    {
+
+      method: "PUT",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+        nombre
+      })
+
+    }
+  );
+
+  cargarEmpresasAdmin();
+
+}
+
+async function cargarEmpresasAdmin() {
+
+  const buscar =
+    document.getElementById(
+      "buscar-empresa-admin"
+    )?.value
+      .toLowerCase() || "";
+
+  const estado =
+    document.getElementById(
+      "estado-empresa-admin"
+    )?.value;
+
+  const res = await fetch(
+    `${CONFIG.API_URL}/admin/empresas`
+  );
+
+  const data =
+    await res.json();
+
+  let lista = data.data;
+
+  if (buscar) {
+
+    lista = lista.filter(
+      e => e.nombre
+        .toLowerCase()
+        .includes(buscar)
+    );
+
+  }
+
+  if (estado !== "") {
+
+    lista = lista.filter(
+      e => String(e.activo) === estado
+    );
+
+  }
+
+  renderEmpresas(lista);
+
+}
+
+async function cargarUsuariosAdmin() {
+
+  const buscar =
+    document.getElementById(
+      "buscar-usuario-admin"
+    )?.value
+      .toLowerCase() || "";
+
+  const estado =
+    document.getElementById(
+      "estado-usuario-admin"
+    )?.value;
+
+  const res =
+    await fetch(
+      `${CONFIG.API_URL}/admin/usuarios`
+    );
+
+  const data =
+    await res.json();
+
+  let lista = data.data;
+
+  if (buscar) {
+
+    lista = lista.filter(
+      u =>
+
+        `${u.nombre}
+${u.apellido}`
+          .toLowerCase()
+          .includes(buscar)
+
+    );
+
+  }
+
+  if (estado !== "") {
+
+    lista = lista.filter(
+      u => String(u.activo) === estado
+    );
+
+  }
+
+  renderUsuarios(lista);
+
+}
+
+async function cambiarEstadoUsuario(id) {
+
+  abrirConfirmacion(
+    "¿Seguro que deseas cambiar el estado de este usuario?",
+    async () => {
+
+      await fetch(
+        `${CONFIG.API_URL}/admin/usuarios/${id}/estado`,
+        {
+          method: "PUT"
+        });
+
+      cargarUsuariosAdmin();
+
+    });
+
+}
+
+let empresaEditando = null;
+
+
+/* ==========================
+MODAL EMPRESA
+========================== */
+
+function abrirModalEmpresa() {
+
+  empresaEditando = null;
+
+  document.getElementById(
+    "empresa-modal-title"
+  ).textContent = "Nueva empresa";
+
+  document.getElementById(
+    "empresa-nombre"
+  ).value = "";
+
+  document.getElementById(
+    "modal-empresa"
+  ).classList.add(
+    "active"
+  );
+
+}
+
+
+function cerrarModalEmpresa() {
+
+  document.getElementById(
+    "modal-empresa"
+  ).classList.remove(
+    "active"
+  );
+
+}
+
+
+/* editar */
+
+function editarEmpresa(
+  id,
+  nombre
+) {
+
+  empresaEditando = id;
+
+  document.getElementById(
+    "empresa-modal-title"
+  ).textContent =
+    "Editar empresa";
+
+  document.getElementById(
+    "empresa-nombre"
+  ).value =
+    nombre;
+
+  document.getElementById(
+    "modal-empresa"
+  ).classList.add(
+    "active"
+  );
+
+}
+
+
+/* guardar */
+
+async function guardarEmpresa() {
+
+  const nombre =
+    document.getElementById(
+      "empresa-nombre"
+    ).value.trim();
+
+  if (!nombre) {
+
+    showToast(
+      "Ingrese un nombre",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const url = empresaEditando
+
+    ? `${CONFIG.API_URL}/admin/empresas/${empresaEditando}`
+
+    : `${CONFIG.API_URL}/admin/empresas`;
+
+
+  const method =
+    empresaEditando
+      ? "PUT"
+      : "POST";
+
+
+  await fetch(
+    url,
+    {
+
+      method,
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+        nombre
+      })
+
+    });
+
+  cerrarModalEmpresa();
+
+  cargarEmpresasAdmin();
+
+  showToast(
+    "Empresa guardada",
+    "success"
+  );
+
+}
+
+
+/* ==========================
+CONFIRMACIÓN
+========================== */
+
+function abrirConfirmacion(
+  texto,
+  callback
+) {
+
+  document.getElementById(
+    "confirm-text"
+  ).textContent =
+    texto;
+
+  document.getElementById(
+    "confirm-btn"
+  ).onclick = () => {
+
+    callback();
+
+    cerrarConfirmacion();
+
+  };
+
+  document.getElementById(
+    "modal-confirmar"
+  ).classList.add(
+    "active"
+  );
+
+}
+
+
+function cerrarConfirmacion() {
+
+  document.getElementById(
+    "modal-confirmar"
+  ).classList.remove(
+    "active"
+  );
+
+}
+
+let usuarioEditando = null;
+let tiposDocumento = [];
+let empresas = [];
+
+async function cargarCatalogosUsuario() {
+
+  try {
+
+    const [tiposRes, empresasRes] = await Promise.all([
+
+      fetch(`${CONFIG.API_URL}/tipos-documento`),
+      fetch(`${CONFIG.API_URL}/admin/empresas/catalogo`)
+
+    ]);
+
+    tiposDocumento = await tiposRes.json();
+
+    const empresasData = await empresasRes.json();
+
+    // ← extraer arreglo correctamente
+    empresas = empresasData.data || [];
+
+    const listaTipos =
+      document.getElementById("lista-tipos");
+
+    listaTipos.innerHTML =
+      tiposDocumento.map(t => `
+        <option value="${t.nombre}"></option>
+      `).join("");
+
+    const listaEmpresas =
+      document.getElementById("lista-empresas");
+
+    listaEmpresas.innerHTML =
+      empresas.map(e => `
+        <option value="${e.nombre}"></option>
+      `).join("");
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    showToast(
+      "Error cargando catálogos",
+      "error"
+    );
+
+  }
+
+}
+
+async function editarUsuario(id) {
+
+  usuarioEditando = id;
+
+  await cargarCatalogosUsuario();
+
+  const res =
+    await fetch(
+      `${CONFIG.API_URL}/admin/usuarios/${id}`
+    );
+
+  const data =
+    await res.json();
+
+  const u = data.data;
+
+  document.getElementById(
+    "u-nombre"
+  ).value = u.nombre || "";
+
+  document.getElementById(
+    "u-apellido"
+  ).value = u.apellido || "";
+
+  document.getElementById(
+    "u-tipo"
+  ).value = u.tipo_documento || "";
+
+  document.getElementById(
+    "u-documento"
+  ).value = u.numero_documento || "";
+
+  document.getElementById(
+    "u-direccion"
+  ).value = u.direccion || "";
+
+  document.getElementById(
+    "u-celular"
+  ).value = u.celular || "";
+
+  document.getElementById(
+    "u-empresa"
+  ).value = u.empresa || "";
+
+  const existeEmpresa = empresas.some(
+    e => e.nombre === u.empresa
+  );
+
+  if (
+    !existeEmpresa &&
+    u.empresa
+  ) {
+
+    empresas.push({
+      id: u.id_empresa,
+      nombre: u.empresa,
+      activo: false
+    });
+
+  }
+
+  document.getElementById(
+    "modal-usuario"
+  ).classList.add(
+    "active"
+  );
+
+}
+
+function confirmarGuardarUsuario() {
+
+  abrirConfirmacion(
+    "¿Guardar cambios del usuario?",
+
+    guardarUsuario
+
+  );
+
+}
+
+async function guardarUsuario() {
+
+  const nombreTipo =
+    document.getElementById(
+      "u-tipo"
+    ).value;
+
+  const nombreEmpresa =
+    document.getElementById(
+      "u-empresa"
+    ).value;
+
+  const tipoSeleccionado =
+    tiposDocumento.find(
+      t => t.nombre === nombreTipo
+    );
+
+  const empresaSeleccionada =
+    empresas.find(
+      e => e.nombre === nombreEmpresa
+    );
+
+  if (
+    empresaSeleccionada &&
+    !empresaSeleccionada.activo
+  ) {
+
+    showToast(
+      "No puedes asignar una empresa inactiva",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const body = {
+
+    nombre:
+      document.getElementById(
+        "u-nombre"
+      ).value,
+
+    apellido:
+      document.getElementById(
+        "u-apellido"
+      ).value,
+
+    id_tipo_documento:
+      tipoSeleccionado?.id || null,
+
+    numero_documento:
+      document.getElementById(
+        "u-documento"
+      ).value,
+
+    direccion:
+      document.getElementById(
+        "u-direccion"
+      ).value,
+
+    celular:
+      document.getElementById(
+        "u-celular"
+      ).value,
+
+    id_empresa:
+      empresaSeleccionada?.id || null
+
+  };
+
+  await fetch(
+
+    `${CONFIG.API_URL}/admin/usuarios/${usuarioEditando}`,
+
+    {
+
+      method: "PUT",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify(body)
+
+    }
+
+  );
+
+  cerrarModalUsuario();
+
+  cargarUsuariosAdmin();
+
+  showToast(
+    "Usuario actualizado",
+    "success"
+  );
+
+}
+
+function cerrarModalUsuario() {
+
+  document.getElementById(
+    "modal-usuario"
+  ).classList.remove(
+    "active"
+  );
+
 }
