@@ -6,25 +6,33 @@
 let currentUser = null;
 
 /* ── ESTADOS ── */
-function getEstadoInfo(estado) {
-  const map = {
-    normal: {
-      clase: 'ok',
-      color: 'var(--green)',
-      label: 'Normal'
+function getEstadoInfo(estado){
+
+  const estados = {
+
+    hipotermia:{
+      label:'Hipotermia',
+      clase:'hipotermia',
+      color:'#3b82f6',
+      consejo:'Tu temperatura está por debajo del rango normal.'
     },
-    fiebre: {
-      clase: 'bad',
-      color: 'var(--red)',
-      label: 'Fiebre'
+
+    normal:{
+      label:'Normal',
+      clase:'normal',
+      color:'#22c55e',
+      consejo:'Tu temperatura está dentro del rango normal.'
+    },
+
+    fiebre:{
+      label:'Fiebre',
+      clase:'fiebre',
+      color:'#ef4444',
+      consejo:'Se detectó una temperatura elevada.'
     }
   };
 
-  return map[estado] || {
-    clase: 'none',
-    color: 'var(--text3)',
-    label: '—'
-  };
+  return estados[estado];
 }
 
 /* ── NAVEGACIÓN ── */

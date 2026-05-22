@@ -45,7 +45,8 @@ function hoyISO() {
 }
 
 function clasificarTemp(temp) {
-  if (temp >= 37.5) return 'fiebre';
+  if (temp < 36.5) return 'hipotermia';
+  if (temp > 37.5) return 'fiebre';
   return 'normal';
 }
 
@@ -147,7 +148,11 @@ function renderEstadoHoy() {
       'status-indicator ' + info.clase;
 
     document.getElementById('status-icon').textContent =
-      ultima.estado === 'normal' ? '✓' : '⚠';
+      ultima.estado === 'normal'
+        ? '✓'
+        : ultima.estado === 'hipotermia'
+          ? '❄'
+          : '⚠';
 
     document.getElementById('status-titulo').textContent = info.label;
     document.getElementById('status-desc').textContent = info.consejo;

@@ -1,6 +1,5 @@
 //PRODUCCION
 
-
 const CONFIG = {
   API_URL: "https://themocheck-backend-production.up.railway.app"
 };
@@ -12,5 +11,5 @@ const CONFIG = {
 const CONFIG = {
   API_URL: "http://localhost:3000"
 };
-
 */
+

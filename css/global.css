@@ -200,3 +200,29 @@ body::before {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: .5; transform: scale(1.5); }
 }
+
+
+
+.badge-estado.normal{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.badge-estado.fiebre{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.badge-estado.hipotermia{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.dot.hipotermia{
+    background:#2563eb;
+}
+
+.status-indicator.hipotermia{
+    background:#dbeafe;
+    color:#2563eb;
+}

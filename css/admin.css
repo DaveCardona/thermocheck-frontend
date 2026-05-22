@@ -573,3 +573,17 @@ box-shadow:0 8px 18px rgba(37,99,235,.3);
     background:#fee2e2;
     color:#dc2626;
 }
+
+.badge-estado.hipotermia{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.dot.hipotermia{
+    background:#2563eb;
+}
+
+.status-indicator.hipotermia{
+    background:#dbeafe;
+    color:#2563eb;
+}

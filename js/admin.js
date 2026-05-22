@@ -173,7 +173,12 @@ async function renderAdminTabla() {
       ? slice.map(l => {
 
         const temp = parseFloat(l.temperatura) || 0;
-        const estado = temp >= 37.5 ? 'fiebre' : 'normal';
+        const estado =
+          temp < 36.5
+            ? 'hipotermia'
+            : temp > 37.5
+              ? 'fiebre'
+              : 'normal';
         const info = getEstadoInfo(estado);
 
         const fechaLocal = l.fecha.replace('Z', '');
