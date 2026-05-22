@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // 🔥 Evitar volver atrás después de logout
+  //  Evitar volver atrás después de logout
   window.addEventListener('pageshow', function () {
     if (!sessionStorage.getItem('currentUser')) {
       window.location.replace('index.html');

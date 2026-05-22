@@ -14,19 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarTiposDocumento() {
   try {
-    const res = await fetch("https://themocheck-backend-production.up.railway.app/tipos-documento");
+    const res = await fetch(`${CONFIG.API_URL}/tipos-documento`);
     const data = await res.json();
 
     const select = document.getElementById('reg-tipo-doc');
-    
-    
-    
+
     data.forEach(td => {
       const opt = document.createElement('option');
       opt.value = td.id;
       opt.textContent = td.nombre;
       select.appendChild(opt);
     });
+
   } catch (err) {
     console.error("Error cargando tipos de documento", err);
   }
@@ -34,16 +33,18 @@ async function cargarTiposDocumento() {
 
 async function cargarEmpresas() {
   try {
-    const res = await fetch("https://themocheck-backend-production.up.railway.app/empresas");
+    const res = await fetch(`${CONFIG.API_URL}/empresas`);
     const data = await res.json();
 
     const select = document.getElementById('reg-empresa');
+
     data.forEach(emp => {
       const opt = document.createElement('option');
       opt.value = emp.id;
       opt.textContent = emp.nombre;
       select.appendChild(opt);
     });
+
   } catch (err) {
     console.error("Error cargando empresas", err);
   }
@@ -65,20 +66,46 @@ function onPassChange() {
 function actualizarFuerzaPassword(val) {
   const bars = document.querySelectorAll('.strength-bar');
   const label = document.getElementById('strength-label');
+
   if (!bars.length || !label) return;
 
   let nivel = 0;
+
   if (val.length >= 6) nivel = 1;
   if (val.length >= 8 && /[A-Z]/.test(val)) nivel = 2;
-  if (val.length >= 8 && /[A-Z]/.test(val) && /[0-9]/.test(val)) nivel = 3;
+  if (
+    val.length >= 8 &&
+    /[A-Z]/.test(val) &&
+    /[0-9]/.test(val)
+  ) nivel = 3;
 
-  const clases = ['', 'active-weak', 'active-medium', 'active-strong'];
-  const textos = ['', 'Débil', 'Media', 'Fuerte'];
-  const colores = ['var(--text3)', 'var(--red)', 'var(--yellow)', 'var(--green)'];
+  const clases = [
+    '',
+    'active-weak',
+    'active-medium',
+    'active-strong'
+  ];
+
+  const textos = [
+    '',
+    'Débil',
+    'Media',
+    'Fuerte'
+  ];
+
+  const colores = [
+    'var(--text3)',
+    'var(--red)',
+    'var(--yellow)',
+    'var(--green)'
+  ];
 
   bars.forEach((b, i) => {
     b.className = 'strength-bar';
-    if (i < nivel) b.classList.add(clases[nivel]);
+
+    if (i < nivel) {
+      b.classList.add(clases[nivel]);
+    }
   });
 
   label.textContent = textos[nivel];
@@ -89,7 +116,9 @@ function actualizarFuerzaPassword(val) {
 
 async function doRegistro(e) {
   e.preventDefault();
-  const g = id => (document.getElementById(id)?.value || '').trim();
+
+  const g = id =>
+    (document.getElementById(id)?.value || '').trim();
 
   const nombre = g('reg-nombre');
   const apellido = g('reg-apellido');
@@ -101,54 +130,85 @@ async function doRegistro(e) {
   const user = g('reg-user').toLowerCase();
   const pass = g('reg-pass');
   const pass2 = g('reg-pass2');
-  const terminos = document.getElementById('reg-terminos')?.checked;
+  const terminos =
+    document.getElementById('reg-terminos')?.checked;
 
   /* ── VALIDACIONES ── */
 
-  if (!nombre || !apellido || !tipoDoc || !numDoc || !empresa || !user || !pass || !pass2) {
-    return mostrarErrorRegistro('Completa todos los campos obligatorios');
+  if (
+    !nombre ||
+    !apellido ||
+    !tipoDoc ||
+    !numDoc ||
+    !empresa ||
+    !user ||
+    !pass ||
+    !pass2
+  ) {
+    return mostrarErrorRegistro(
+      'Completa todos los campos obligatorios'
+    );
   }
 
   if (!direccion) {
-    return mostrarErrorRegistro('La dirección es obligatoria');
+    return mostrarErrorRegistro(
+      'La dirección es obligatoria'
+    );
   }
 
   if (!celular) {
-    return mostrarErrorRegistro('El número de celular es obligatorio');
+    return mostrarErrorRegistro(
+      'El número de celular es obligatorio'
+    );
   }
 
   if (!/^\d{6,12}$/.test(numDoc)) {
-    return mostrarErrorRegistro('El documento debe tener entre 6 y 12 dígitos');
+    return mostrarErrorRegistro(
+      'El documento debe tener entre 6 y 12 dígitos'
+    );
   }
 
   if (user.length < 4) {
-    return mostrarErrorRegistro('El usuario debe tener mínimo 4 caracteres');
+    return mostrarErrorRegistro(
+      'El usuario debe tener mínimo 4 caracteres'
+    );
   }
 
   if (pass.length < 6) {
-    return mostrarErrorRegistro('La contraseña debe tener mínimo 6 caracteres');
+    return mostrarErrorRegistro(
+      'La contraseña debe tener mínimo 6 caracteres'
+    );
   }
 
   if (pass !== pass2) {
-    return mostrarErrorRegistro('Las contraseñas no coinciden');
+    return mostrarErrorRegistro(
+      'Las contraseñas no coinciden'
+    );
   }
 
   if (!terminos) {
-    return mostrarErrorRegistro('Debes aceptar el tratamiento de datos');
+    return mostrarErrorRegistro(
+      'Debes aceptar el tratamiento de datos'
+    );
   }
 
   if (!tipoDoc || tipoDoc === "") {
-    return mostrarErrorRegistro('Selecciona un tipo de documento');
+    return mostrarErrorRegistro(
+      'Selecciona un tipo de documento'
+    );
   }
 
   if (!empresa || empresa === "") {
-    return mostrarErrorRegistro('Selecciona una empresa');
+    return mostrarErrorRegistro(
+      'Selecciona una empresa'
+    );
   }
 
   /* ── PETICIÓN AL BACKEND ── */
 
   try {
-    const res = await fetch("https://themocheck-backend-production.up.railway.app/register", {
+
+    const res = await fetch(`${CONFIG.API_URL}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -177,7 +237,9 @@ async function doRegistro(e) {
 
   } catch (error) {
     console.error(error);
-    mostrarErrorRegistro("Error de conexión con el servidor");
+    mostrarErrorRegistro(
+      "Error de conexión con el servidor"
+    );
   }
 }
 
@@ -185,23 +247,44 @@ async function doRegistro(e) {
 
 function mostrarErrorRegistro(msg) {
   const e = document.getElementById('reg-error');
+
   if (!e) return;
+
   e.textContent = msg;
   e.style.display = 'block';
 }
 
 function mostrarExito(nombre) {
+
   document.getElementById('registro-form').style.display = 'none';
-  document.querySelector('.registro-header').style.display = 'none';
 
-  document.getElementById('registro-exito').style.display = 'block';
-  document.getElementById('exito-nombre').textContent = nombre;
+  document.querySelector('.registro-header').style.display =
+    'none';
 
-  showToast(`Cuenta creada correctamente`, 'ok');
+  document.getElementById('registro-exito').style.display =
+    'block';
+
+  document.getElementById('exito-nombre').textContent =
+    nombre;
+
+  showToast(
+    `Cuenta creada correctamente`,
+    'ok'
+  );
 }
 
 function irALoginDesdeExito() {
-  const user = (document.getElementById('reg-user')?.value || '').trim().toLowerCase();
-  if (user) sessionStorage.setItem('prefill_user', user);
+  const user =
+    (document.getElementById('reg-user')?.value || '')
+      .trim()
+      .toLowerCase();
+
+  if (user) {
+    sessionStorage.setItem(
+      'prefill_user',
+      user
+    );
+  }
+
   window.location.href = 'index.html';
 }
