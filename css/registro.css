@@ -236,3 +236,38 @@
   font-size: .88rem;
   margin-bottom: 1.5rem;
 }
+
+.input-error {
+  border-color: #C0392B !important;
+ 
+}
+
+.field-error-msg {
+  display: none;
+  font-size: 0.75rem;
+  color: #C0392B;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #E0DDD8;
+  transition: background 0.3s;
+}
+
+.strength-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 44px;
+  text-align: right;
+}

@@ -1118,6 +1118,7 @@ async function editarUsuario(id) {
 
   }
 
+  iniciarValidacionesModalUsuario();
   document.getElementById(
     "modal-usuario"
   ).classList.add(
@@ -1127,7 +1128,7 @@ async function editarUsuario(id) {
 }
 
 function confirmarGuardarUsuario() {
-
+if (!validarModalUsuario()) return;
   abrirConfirmacion(
     "¿Guardar cambios del usuario?",
 

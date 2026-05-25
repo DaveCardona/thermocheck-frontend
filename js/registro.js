@@ -117,6 +117,7 @@ function actualizarFuerzaPassword(val) {
 async function doRegistro(e) {
   e.preventDefault();
 
+  if (!validarFormularioCompleto()) return;
   const g = id =>
     (document.getElementById(id)?.value || '').trim();
 

@@ -367,3 +367,242 @@
     background:#dbeafe;
     color:#2563eb;
 }
+.btn-perfil {
+  background: transparent;
+  border: 1px solid var(--border, #E2DDD4);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: .85rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text, #1C1B18);
+  transition: background .15s;
+}
+.btn-perfil:hover {
+  background: var(--surface2, #F0EEE8);
+}
+
+.perfil-label {
+  display: block;
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--text2, #555);
+  margin-bottom: 4px;
+}
+
+.input-error {
+  border-color: #C0392B !important;
+}
+
+.field-error-msg {
+  display: none;
+  font-size: .75rem;
+  color: #C0392B;
+  margin-top: 4px;
+  font-weight: 500;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 750px;
+  /* ⬅️ más ancho */
+  max-width: 95%;
+  padding: 1.5rem;
+  animation: fadeIn .2s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  font-family: var(--mono);
+  font-size: 1rem;
+}
+
+.modal-header button {
+  background: transparent;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.modal-body {
+  font-size: .9rem;
+  color: var(--text);
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.modal-section {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+
+.modal-section h4 {
+  font-size: .75rem;
+  margin-bottom: .6rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.modal-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: .6rem 1rem;
+  font-size: .88rem;
+}
+#modal-perfil {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.832);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+#modal-perfil.active {
+  display: flex;
+  width: 100%;
+}
+.tabla-search {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .35rem .85rem;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: .85rem;
+  outline: none;
+  width: 100%;
+  transition: border-color .2s;
+}
+
+.tabla-search:focus {
+  border-color: var(--accent);
+}
+
+.tabla-search::placeholder {
+  color: var(--text3);
+}
+
+.tabla-search:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-cancelar {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: .7rem 1.2rem;
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-confirmar {
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  border: none;
+  padding: .7rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+.field-error-msg {
+  display: none;
+  font-size: 0.72rem;
+  color: #ef4444;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.modal-grid label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.modal-grid > div {
+  display: flex;
+  flex-direction: column;
+}
+/* ── Modal perfil paciente ── */
+#modal-perfil {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+#modal-perfil.active {
+  display: flex;
+}
+
+#modal-perfil .modal-content {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 100%;
+  padding: 1.5rem;
+  animation: fadeIn .2s ease;
+  text-align: left;
+}

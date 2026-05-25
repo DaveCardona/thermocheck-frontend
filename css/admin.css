@@ -587,3 +587,44 @@ box-shadow:0 8px 18px rgba(37,99,235,.3);
     background:#dbeafe;
     color:#2563eb;
 }
+/* ── Validaciones: borde rojo y mensaje de error ── */
+
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+.field-error-msg {
+  display: none;
+  font-size: 0.72rem;
+  color: #ef4444;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* ── Labels del modal usuario / perfil ── */
+.modal-grid label,
+.perfil-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+/* ── Inputs del modal con label encima ── */
+.modal-grid > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-grid > div input {
+  width: 100%;
+}
+
+/* ── Input deshabilitado (campos solo lectura en perfil) ── */
+.modal-grid input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
