@@ -517,6 +517,12 @@ function renderEmpresas(lista) {
 
 <td>${e.nombre}</td>
 
+<td>${e.direccion || "-"}</td>
+
+<td>${e.celular || "-"}</td>
+
+<td>${e.correo || "-"}</td>
+
 <td>
 
 <span class="
@@ -534,12 +540,14 @@ ${e.activo ? "Activa" : "Inactiva"}
 
 <button
 class="btn-editar"
-onclick="
-editarEmpresa(
+onclick='editarEmpresa(
 ${e.id_empresa},
-'${e.nombre}'
-)
-">
+${JSON.stringify(e.nombre || "")},
+${JSON.stringify(e.direccion || "")},
+${JSON.stringify(e.celular || "")},
+${JSON.stringify(e.correo || "")}
+)'
+>
 Editar
 </button>
 
@@ -685,41 +693,6 @@ async function cambiarEstadoEmpresa(id) {
 
 
 
-async function editarEmpresa(
-  id,
-  nombreActual
-) {
-
-  const nombre =
-    prompt(
-      "Nuevo nombre:",
-      nombreActual
-    );
-
-  if (!nombre) return;
-
-  await fetch(
-    `${CONFIG.API_URL}/admin/empresas/${id}`,
-    {
-
-      method: "PUT",
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-        nombre
-      })
-
-    }
-  );
-
-  cargarEmpresasAdmin();
-
-}
-
 async function cargarEmpresasAdmin() {
 
   const buscar =
@@ -844,10 +817,23 @@ function abrirModalEmpresa() {
 
   document.getElementById(
     "empresa-modal-title"
-  ).textContent = "Nueva empresa";
+  ).textContent =
+    "Nueva empresa";
 
   document.getElementById(
     "empresa-nombre"
+  ).value = "";
+
+  document.getElementById(
+    "empresa-direccion"
+  ).value = "";
+
+  document.getElementById(
+    "empresa-celular"
+  ).value = "";
+
+  document.getElementById(
+    "empresa-correo"
   ).value = "";
 
   document.getElementById(
@@ -871,10 +857,12 @@ function cerrarModalEmpresa() {
 
 
 /* editar */
-
 function editarEmpresa(
   id,
-  nombre
+  nombre,
+  direccion,
+  celular,
+  correo
 ) {
 
   empresaEditando = id;
@@ -887,7 +875,22 @@ function editarEmpresa(
   document.getElementById(
     "empresa-nombre"
   ).value =
-    nombre;
+    nombre || "";
+
+  document.getElementById(
+    "empresa-direccion"
+  ).value =
+    direccion || "";
+
+  document.getElementById(
+    "empresa-celular"
+  ).value =
+    celular || "";
+
+  document.getElementById(
+    "empresa-correo"
+  ).value =
+    correo || "";
 
   document.getElementById(
     "modal-empresa"
@@ -907,6 +910,22 @@ async function guardarEmpresa() {
       "empresa-nombre"
     ).value.trim();
 
+  const direccion =
+    document.getElementById(
+      "empresa-direccion"
+    ).value.trim();
+
+  const celular =
+    document.getElementById(
+      "empresa-celular"
+    ).value.trim();
+
+  const correo =
+    document.getElementById(
+      "empresa-correo"
+    ).value.trim();
+
+
   if (!nombre) {
 
     showToast(
@@ -919,39 +938,56 @@ async function guardarEmpresa() {
   }
 
 
-  const url = empresaEditando
+  const body = {
 
-    ? `${CONFIG.API_URL}/admin/empresas/${empresaEditando}`
+    nombre,
+    direccion,
+    celular,
+    correo
 
-    : `${CONFIG.API_URL}/admin/empresas`;
+  };
+
+
+  const url =
+
+    empresaEditando
+
+      ? `${CONFIG.API_URL}/admin/empresas/${empresaEditando}`
+
+      : `${CONFIG.API_URL}/admin/empresas`;
 
 
   const method =
+
     empresaEditando
       ? "PUT"
       : "POST";
 
 
-  await fetch(
+  const res = await fetch(
     url,
     {
-
       method,
-
       headers: {
-        "Content-Type":
-          "application/json"
+        "Content-Type": "application/json"
       },
+      body: JSON.stringify(body)
+    }
+  );
 
-      body: JSON.stringify({
-        nombre
-      })
+  const data = await res.json();
 
-    });
+  if (!data.success) {
+    showToast(
+      "Error guardando empresa",
+      "error"
+    );
+    return;
+  }
 
   cerrarModalEmpresa();
 
-  cargarEmpresasAdmin();
+  await cargarEmpresasAdmin();
 
   showToast(
     "Empresa guardada",
@@ -1128,7 +1164,7 @@ async function editarUsuario(id) {
 }
 
 function confirmarGuardarUsuario() {
-if (!validarModalUsuario()) return;
+  if (!validarModalUsuario()) return;
   abrirConfirmacion(
     "¿Guardar cambios del usuario?",
 
