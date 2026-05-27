@@ -836,6 +836,9 @@ function abrirModalEmpresa() {
     "empresa-correo"
   ).value = "";
 
+  // iniciar validaciones
+  iniciarValidacionesModalEmpresa();
+
   document.getElementById(
     "modal-empresa"
   ).classList.add(
@@ -892,6 +895,9 @@ function editarEmpresa(
   ).value =
     correo || "";
 
+  // iniciar validaciones
+  iniciarValidacionesModalEmpresa();
+
   document.getElementById(
     "modal-empresa"
   ).classList.add(
@@ -900,6 +906,8 @@ function editarEmpresa(
 
 }
 
+
+/* guardar */
 
 /* guardar */
 
@@ -925,7 +933,6 @@ async function guardarEmpresa() {
       "empresa-correo"
     ).value.trim();
 
-
   if (!nombre) {
 
     showToast(
@@ -937,6 +944,10 @@ async function guardarEmpresa() {
 
   }
 
+  // validar datos empresa
+  if (!validarModalEmpresa()) {
+    return;
+  }
 
   const body = {
 
@@ -947,7 +958,6 @@ async function guardarEmpresa() {
 
   };
 
-
   const url =
 
     empresaEditando
@@ -956,13 +966,11 @@ async function guardarEmpresa() {
 
       : `${CONFIG.API_URL}/admin/empresas`;
 
-
   const method =
 
     empresaEditando
       ? "PUT"
       : "POST";
-
 
   const res = await fetch(
     url,
@@ -978,11 +986,14 @@ async function guardarEmpresa() {
   const data = await res.json();
 
   if (!data.success) {
+
     showToast(
       "Error guardando empresa",
       "error"
     );
+
     return;
+
   }
 
   cerrarModalEmpresa();
@@ -1282,5 +1293,140 @@ function cerrarModalUsuario() {
   ).classList.remove(
     "active"
   );
+
+}
+
+/* ==========================
+VALIDACIONES EMPRESA
+========================== */
+
+function iniciarValidacionesModalEmpresa() {
+
+  const celular =
+    document.getElementById(
+      "empresa-celular"
+    );
+
+  const correo =
+    document.getElementById(
+      "empresa-correo"
+    );
+
+  // Solo números en celular
+  celular.addEventListener(
+    "input",
+    function () {
+
+      this.value =
+        this.value.replace(
+          /\D/g,
+          ""
+        );
+
+    }
+  );
+
+  // Validación visual correo
+  correo.addEventListener(
+    "blur",
+    function () {
+
+      if (
+        this.value &&
+        !validarCorreoEmpresa(
+          this.value
+        )
+      ) {
+
+        this.style.border =
+          "1px solid #ef4444";
+
+      } else {
+
+        this.style.border =
+          "";
+
+      }
+
+    }
+  );
+
+}
+
+function validarCorreoEmpresa(
+  correo
+) {
+
+  const regex =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  return regex.test(
+    correo
+  );
+
+}
+
+function validarModalEmpresa() {
+
+  const celular =
+    document.getElementById(
+      "empresa-celular"
+    ).value.trim();
+
+  const correo =
+    document.getElementById(
+      "empresa-correo"
+    ).value.trim();
+
+  // celular solo números
+  if (
+    celular &&
+    !/^\d+$/.test(
+      celular
+    )
+  ) {
+
+    showToast(
+      "El celular solo puede contener números",
+      "error"
+    );
+
+    return false;
+
+  }
+
+  // longitud opcional
+  if (
+    celular &&
+    celular.length < 10
+  ) {
+
+    showToast(
+      "El celular debe tener 10 dígitos",
+      "error"
+    );
+
+    return false;
+
+  }
+
+  // correo válido
+  if (
+    correo &&
+    !validarCorreoEmpresa(
+      correo
+    )
+  ) {
+
+    showToast(
+      "Ingrese un correo válido",
+      "error"
+    );
+
+    return false;
+
+  }
+
+  return true;
 
 }
